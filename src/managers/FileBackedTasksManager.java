@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
-    private Path path;
+    private final Path path;
 
     public FileBackedTasksManager (Path path) {
         this.path = path;

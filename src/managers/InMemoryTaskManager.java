@@ -10,14 +10,14 @@ import java.util.*;
 public class InMemoryTaskManager implements TaskManager {
     private int nextId = 1;
 
-    private HistoryManager historyManager = managers.Managers.getDefaultHistory();
-    private HashMap<Integer, SingleTask> tasks = new HashMap<>();
-    private HashMap<Integer, Epic> epics = new HashMap<>();
-    private HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    private final HistoryManager historyManager = managers.Managers.getDefaultHistory();
+    private final HashMap<Integer, SingleTask> tasks = new HashMap<>();
+    private final HashMap<Integer, Epic> epics = new HashMap<>();
+    private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
     //Comparator<Task> comparator = new IdComparator().thenComparing(new StartTimeComparator());
     Comparator<Task> comparator = new StartTimeComparator().thenComparing(new IdComparator());
 
-    private Set<Task> tasksWithPriority = new TreeSet<>(comparator);
+    private final Set<Task> tasksWithPriority = new TreeSet<>(comparator);
 
     public int getNextId() {
         return nextId;

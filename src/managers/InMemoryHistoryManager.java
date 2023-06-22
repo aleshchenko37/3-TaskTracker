@@ -11,7 +11,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     private Node<Task> head;
     private Node<Task> tail;
 
-    private Map<Integer, Node<Task>> taskHistory = new HashMap<>();
+    private final Map<Integer, Node<Task>> taskHistory = new HashMap<>();
 
     private boolean isEmpty() { // метод проверки истории на наличие задач
         return head == null;

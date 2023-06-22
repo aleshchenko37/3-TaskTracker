@@ -2,6 +2,7 @@ import exceptions.ManagerSaveException;
 import managers.FileBackedTasksManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import tasks.*;
 
 import java.io.BufferedReader;
@@ -9,27 +10,41 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.nio.file.Files.deleteIfExists;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
-    String historyFile = "C:\\Users\\alesh\\dev\\java-kanban\\src\\historyFileTest.csv";
+    @TempDir
+    public Path tempDir; // создается временная директория, так как поле помечено @TempDir
+    Path historyPath;
+    String historyFile = "historyFileTest.csv";
+
+    @Test
+    public void testFileHolder() {
+        assertNotNull(tempDir);
+    }
+
     @BeforeEach
-    public void removeFile() {
+    public void setUp() throws IOException {
+        //метод создает и записывает файл с именем historyFileTest.csv во временный каталог tempDir
         try {
-            boolean isRemoved = deleteIfExists(Path.of(historyFile)); // перед загрузкой данных удаляем файл
-            Files.createFile(Path.of(historyFile)); // создается пустой файл с тестовой историей
-            taskManager = new FileBackedTasksManager(Path.of(historyFile)); // создается новый менеджер без истории
-        } catch (IOException e) {
-            e.getMessage();
+            historyPath = tempDir.resolve(historyFile);
+            // resolve() из абсолютного (tempDir) и относительного (historyPath) пути строит новый абсолютный путь к новому файлу с историей
+            // после завершения тестов файл удаляется
+
         }
+        catch(InvalidPathException ipe) {
+            System.err.println(
+                    "error creating temporary test file in " +
+                            this.getClass().getSimpleName() );
+        }
+        taskManager = new FileBackedTasksManager(historyPath); // создается новый менеджер без истории
     }
 
     @Test
@@ -108,7 +123,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         taskManager.removeSubtask(5);
 
         List<String> tasksArray = new ArrayList<>();
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(historyFile, StandardCharsets.UTF_8))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(historyPath.toString(), StandardCharsets.UTF_8))) {
             while (bufferedReader.ready()) {
                 String line = bufferedReader.readLine();
                 if (!line.equals("")) {
