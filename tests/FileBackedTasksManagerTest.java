@@ -44,7 +44,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
                     "error creating temporary test file in " +
                             this.getClass().getSimpleName() );
         }
-        taskManager = new FileBackedTasksManager(historyPath); // создается новый менеджер без истории
+        taskManager = new FileBackedTasksManager(historyPath.toString()); // создается новый менеджер без истории
     }
 
     @Test

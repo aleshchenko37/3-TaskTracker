@@ -7,20 +7,19 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
-    private final Path path;
+    private final String path;
 
-    public FileBackedTasksManager (Path path) {
+    public FileBackedTasksManager (String path) {
         this.path = path;
     }
 
     public static void main(String[] args) throws IOException {
-        Path historyFile = Paths.get("C:\\Users\\alesh\\dev\\java-kanban\\src\\historyFile.csv");
+        String historyFile = "C:\\Users\\alesh\\dev\\java-kanban\\src\\historyFile.csv";
         InMemoryTaskManager manager = new FileBackedTasksManager(historyFile);
         manager.addTask(new SingleTask("Задача 1", "Выполнить задачу 1", TaskStatus.NEW, 30,
                 Instant.ofEpochSecond(1687244400))); // 20/06/ 07:00
@@ -50,24 +49,22 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
         FileBackedTasksManager newManager = FileBackedTasksManager.loadFromFile(new File(
                 "C:\\Users\\alesh\\dev\\java-kanban\\src\\historyFile.csv"));
-        newManager.addSubtask(new Subtask("Подзадача 4", "Выполнить подзадачу 4", TaskStatus.IN_PROGRESS,
-                4, 60, Instant.ofEpochSecond(1687271400))); // 20/06 14:30
-        newManager.getSubtask(8);
         System.out.println(newManager.getHistory());
         System.out.println(manager.getPrioritizedTasks());
     }
 
     private void save() {
+        Path pathToHistoryFile = Path.of(path);
         try { // проверка наличия файла и его перезапись
-            if (Files.exists(path)) {
-                Files.delete(path);
+            if (Files.exists(pathToHistoryFile)) {
+                Files.delete(pathToHistoryFile);
             }
-            Files.createFile(path);
+            Files.createFile(pathToHistoryFile);
         } catch (IOException e) {
             throw new ManagerSaveException("Не удалось найти файл для записи данных");
         }
         // запись текущего состояния менеджера
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path.toFile(), StandardCharsets.UTF_8))) {
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(pathToHistoryFile.toFile(), StandardCharsets.UTF_8))) {
             bufferedWriter.write("id,type,name,status,description,epic,duration,startTime" + '\n');
 
             String data = "";
@@ -102,7 +99,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     public static FileBackedTasksManager loadFromFile(File historyFile) throws IOException {
         List<String> tasksArray = new ArrayList<>();
         String history = "";
-        FileBackedTasksManager manager = new FileBackedTasksManager(historyFile.toPath());
+        FileBackedTasksManager manager = new FileBackedTasksManager(historyFile.toString());
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(historyFile, StandardCharsets.UTF_8))) {
             while (bufferedReader.ready()) {
                 String line = bufferedReader.readLine();
@@ -129,11 +126,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             }
             addTaskWithoutSaving(manager, task);
             // добавляем id сабтасков в эпики, когда все задачи размещены в мапы
-            for (Subtask subtask : manager.getSubtasks().values()) {
-                manager.getEpics().get(subtask.getEpicId()).getSubtasksIds().add(subtask.getId());
-            }
 
             manager.setNextId(curId + 1);
+        }
+        for (Subtask subtask : manager.getSubtasks().values()) {
+            manager.getEpics().get(subtask.getEpicId()).getSubtasksIds().add(subtask.getId());
         }
 
         if (!tasksArray.isEmpty()) {
@@ -165,8 +162,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             manager.getEpics().put(task.getId(), ((Epic) task));
         } else if (task instanceof Subtask) {
             manager.getSubtasks().put(task.getId(), (Subtask) task);
+            manager.getTasksWithPriority().add(task);
         } else if (task instanceof SingleTask) {
             manager.getTasks().put(task.getId(), (SingleTask) task);
+            manager.getTasksWithPriority().add(task);
         }
     }
 

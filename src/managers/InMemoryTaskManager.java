@@ -46,6 +46,9 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Task> getHistory() {
         return historyManager.getHistory();
     }
+    public Set<Task> getTasksWithPriority() {
+        return tasksWithPriority;
+    }
 
     @Override
     public void addTask(SingleTask task) {
