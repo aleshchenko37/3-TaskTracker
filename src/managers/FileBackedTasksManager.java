@@ -1,5 +1,6 @@
 package managers;
 
+import com.google.gson.Gson;
 import exceptions.ManagerSaveException;
 import tasks.*;
 
@@ -17,7 +18,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     public FileBackedTasksManager (String path) {
         this.path = path;
     }
-
     public static void main(String[] args) throws IOException {
         String historyFile = "C:\\Users\\alesh\\dev\\java-kanban\\src\\historyFile.csv";
         InMemoryTaskManager manager = new FileBackedTasksManager(historyFile);
@@ -53,7 +53,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         System.out.println(manager.getPrioritizedTasks());
     }
 
-    private void save() {
+    protected void save() {
         Path pathToHistoryFile = Path.of(path);
         try { // проверка наличия файла и его перезапись
             if (Files.exists(pathToHistoryFile)) {
@@ -87,7 +87,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    private static String historyToString(HistoryManager manager) {
+    protected static String historyToString(HistoryManager manager) {
         List<Task> historyList = manager.getHistory();
         String idsHistory = "";
         for (Task task : historyList) {
@@ -148,7 +148,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return manager;
     }
 
-    private static List<Integer> historyFromString(String value) {
+    protected static List<Integer> historyFromString(String value) {
         List<Integer> listOfIds = new ArrayList<>();
         String[] historyIds = value.split(",");
         for (String id : historyIds) {
@@ -157,7 +157,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return listOfIds;
     }
 
-    private static void addTaskWithoutSaving(FileBackedTasksManager manager, Task task) {
+    protected static void addTaskWithoutSaving(FileBackedTasksManager manager, Task task) {
         if (task instanceof Epic) {
             manager.getEpics().put(task.getId(), ((Epic) task));
         } else if (task instanceof Subtask) {

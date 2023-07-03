@@ -11,11 +11,21 @@ public abstract class Task {
     private TaskStatus taskStatus;
     private long duration;
     protected Instant startTime;
+    //protected Instant endTime;
 
     public Task(String name, String description, TaskStatus taskStatus, long duration, Instant startTime) {
         this.name = name;
         this.description = description;
         this.id = 0;
+        this.taskStatus = taskStatus;
+        this.duration = duration;
+        this.startTime = startTime;
+    }
+
+    public Task(String name, String description, int id, TaskStatus taskStatus, long duration, Instant startTime) {
+        this.name = name;
+        this.description = description;
+        this.id = id;
         this.taskStatus = taskStatus;
         this.duration = duration;
         this.startTime = startTime;

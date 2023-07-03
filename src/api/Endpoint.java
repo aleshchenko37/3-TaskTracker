@@ -2,14 +2,14 @@ package api;
 
 public enum Endpoint {
         POST_ADD_TASK, 
-        POST_UPDATE_TASK, 
+        PUT_UPDATE_TASK,
         GET_LIST_OF_TASKS, 
         DELETE_TASK, 
         DELETE_ALL_TASKS, 
         GET_TASK, 
 
         POST_ADD_EPIC, 
-        POST_UPDATE_EPIC, 
+        PUT_UPDATE_EPIC,
         GET_LIST_OF_EPICS, 
         GET_LIST_OF_EPIC_SUBTASKS, 
         DELETE_EPIC, 
@@ -17,7 +17,7 @@ public enum Endpoint {
         GET_EPIC, 
 
         POST_ADD_SUBTASK, 
-        POST_UPDATE_SUBTASK, 
+        PUT_UPDATE_SUBTASK,
         GET_LIST_OF_SUBTASKS, 
         DELETE_SUBTASK, 
         DELETE_ALL_SUBTASKS, 

@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import managers.FileBackedTasksManager;
+import managers.*;
 import tasks.Epic;
 import tasks.SingleTask;
 import tasks.Subtask;
@@ -21,17 +21,14 @@ import static api.Endpoint.POST_ADD_TASK;
 public class HttpTaskServer {
     private static final int PORT = 8080;
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
-    private static final Gson gson = new Gson();
     private final HttpServer httpServer;
-    private FileBackedTasksManager taskManager;
+    private static final Gson gson = new Gson();
+    private TaskManager taskManager;
 
     public HttpTaskServer() throws IOException {
-        httpServer = HttpServer.create();
-
-        httpServer.bind(new InetSocketAddress(PORT), 0);
+        httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks", new TaskHandler());
         httpServer.start();
-        taskManager = FileBackedTasksManager.loadFromFile(new File("C:\\Users\\alesh\\dev\\java-kanban\\src\\historyFile.csv"));
 
         System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
     }
@@ -54,7 +51,7 @@ public class HttpTaskServer {
                         response = gson.toJson("Задача успешно добавлена");
                         codeStatus = 201;
                         break;
-                    case POST_UPDATE_TASK:
+                    case PUT_UPDATE_TASK:
                         SingleTask newTask = gson.fromJson(new String(exchange.getRequestBody()
                                 .readAllBytes(), StandardCharsets.UTF_8), SingleTask.class);
                         taskManager.updateTask(newTask);
@@ -87,7 +84,7 @@ public class HttpTaskServer {
                         response = gson.toJson("Эпик успешно добавлен");
                         codeStatus = 201;
                         break;
-                    case POST_UPDATE_EPIC:
+                    case PUT_UPDATE_EPIC:
                         Epic newEpic = gson.fromJson(new String(exchange.getRequestBody()
                                 .readAllBytes(), StandardCharsets.UTF_8), Epic.class);
                         taskManager.updateEpic(newEpic);
@@ -123,7 +120,7 @@ public class HttpTaskServer {
                         response = gson.toJson("Подзадача успешно добавлена");
                         codeStatus = 201;
                         break;
-                    case POST_UPDATE_SUBTASK:
+                    case PUT_UPDATE_SUBTASK:
                         Subtask newSubtask = gson.fromJson(new String(exchange.getRequestBody()
                                 .readAllBytes(), StandardCharsets.UTF_8), Subtask.class);
                         taskManager.updateSubtask(newSubtask);
@@ -226,25 +223,25 @@ public class HttpTaskServer {
             }
 
             if (requestMethod.equals("POST")) {
-                if (pathParts.length == 3) {
-                    switch (pathParts[2]) {
-                        case "task":
-                            return POST_ADD_TASK;
-                        case "epic":
-                            return Endpoint.POST_ADD_EPIC;
-                        case "subtask":
-                            return Endpoint.POST_ADD_SUBTASK;
-                    }
-                } else if (pathParts.length == 4 && pathParts[3].equals("update")) {
-                    switch (pathParts[2]) {
-                        case "task":
-                            return Endpoint.POST_UPDATE_TASK;
-                        case "epic":
-                            return Endpoint.POST_UPDATE_EPIC;
-                        case "subtask":
-                            return Endpoint.POST_UPDATE_SUBTASK;
-                    }
+                switch (pathParts[2]) {
+                    case "task":
+                        return POST_ADD_TASK;
+                    case "epic":
+                        return Endpoint.POST_ADD_EPIC;
+                    case "subtask":
+                        return Endpoint.POST_ADD_SUBTASK;
                 }
+            }
+
+            if (requestMethod.equals("PUT")) {
+                    switch (pathParts[2]) {
+                        case "task":
+                            return Endpoint.PUT_UPDATE_TASK;
+                        case "epic":
+                            return Endpoint.PUT_UPDATE_EPIC;
+                        case "subtask":
+                            return Endpoint.PUT_UPDATE_SUBTASK;
+                    }
             }
 
             if (requestMethod.equals("DELETE")) {

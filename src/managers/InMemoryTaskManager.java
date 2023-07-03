@@ -14,7 +14,6 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, SingleTask> tasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    //Comparator<Task> comparator = new IdComparator().thenComparing(new StartTimeComparator());
     Comparator<Task> comparator = new StartTimeComparator().thenComparing(new IdComparator());
 
     private final Set<Task> tasksWithPriority = new TreeSet<>(comparator);

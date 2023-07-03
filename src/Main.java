@@ -1,46 +1,53 @@
 import api.HttpTaskServer;
+import api.KVServer;
+import api.KVTaskClient;
+import com.google.gson.Gson;
+import managers.FileBackedTasksManager;
+import managers.HttpTaskManager;
+import managers.Managers;
+import tasks.Epic;
+import tasks.SingleTask;
+import tasks.Subtask;
+import tasks.TaskStatus;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.time.Instant;
 
 public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        HttpTaskServer httpTaskServer = new HttpTaskServer();
+        new KVServer().start();
+        HttpTaskManager taskManager = Managers.getDefault(); // в конструкторе менеджера создается и открывается KVServer
+        taskManager.addTask(new SingleTask("Задача 1", "Выполнить задачу 1", TaskStatus.NEW, 30,
+                Instant.ofEpochSecond(1687244400))); // 20/06/ 07:00
+        taskManager.addTask(new SingleTask("Задача 2", "Выполнить задачу 2",  TaskStatus.NEW, 160,
+                Instant.ofEpochSecond(1687078800))); // 18/06/ 09:00
+        taskManager.addEpic(new Epic("Эпик 1", "Выполнить эпик 1"));
+        taskManager.addEpic(new Epic("Эпик 2", "Выполнить эпик 2"));
+        taskManager.addSubtask(new Subtask("Подзадача 1", "Выполнить подзадачу 1", TaskStatus.NEW, 3,
+                25, Instant.ofEpochSecond(1687266000))); //20/06 13:00
+        taskManager.addSubtask(new Subtask("Подзадача 2", "Выполнить подзадачу 2",  TaskStatus.NEW, 3,
+                15, Instant.ofEpochSecond(1687273200))); //20/06 15:00
+        taskManager.addSubtask(new Subtask("Подзадача 3", "Выполнить подзадачу 3", TaskStatus.NEW, 3,
+                60, Instant.ofEpochSecond(1687285800))); //20/06 18:30
 
-        /*HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:8080/tasks/epics");
-        HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
-        HttpResponse response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response);*/
+        taskManager.getEpic(4);
+        taskManager.getEpic(3);
+        taskManager.getTask(1);
+        taskManager.getSubtask(6);
+        taskManager.getTask(2);
+        taskManager.getEpic(3);
+        taskManager.getSubtask(7);
+        taskManager.getSubtask(6);
+        taskManager.getSubtask(5);
 
-        /*HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:8080/tasks/epic/subtasks/?id=3");
-        HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
-        HttpResponse response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response);*/
+        System.out.println(taskManager.getHistory());
+        System.out.println(taskManager.getPrioritizedTasks());
 
-        /*HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:8080/tasks/task/?id=1");
-        HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
-        HttpResponse response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response);*/
 
-        /*HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:8080/tasks/task/");
-        Gson gson = new Gson();
-        String json = gson.toJson(new SingleTask("Задача 99", "Выполнить задачу 99", TaskStatus.IN_PROGRESS, 120,
-                Instant.ofEpochSecond(1688281200)));
-        final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
-        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response);*/
+        HttpTaskManager newHttpTaskManager = taskManager.load(taskManager.getKvTaskClient().getAPI_TOKEN());
 
-        /*new KVServer().start();
-        new api.HttpTaskServer();
-        HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:8080/tasks/tasks/");
-        HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response);*/
     }
 }

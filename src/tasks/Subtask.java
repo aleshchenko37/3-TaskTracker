@@ -10,6 +10,11 @@ public class Subtask extends Task {
         this.epicId = epicId;
     }
 
+    public Subtask(String name, String description, int id, TaskStatus taskStatus, int epicId, long duration, Instant startTime) {
+        super(name, description, taskStatus, duration, startTime);
+        this.epicId = epicId;
+    }
+
     public int getEpicId() {
         return epicId;
     }
