@@ -5,11 +5,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import tasks.*;
+import tasks.Epic;
+import tasks.SingleTask;
+import tasks.Subtask;
+import tasks.Task;
 
 import java.io.IOException;
 import java.net.URI;
-import java.time.Instant;
 import java.util.List;
 
 public class HttpTaskManager extends FileBackedTasksManager {
@@ -19,7 +21,7 @@ public class HttpTaskManager extends FileBackedTasksManager {
     public HttpTaskManager(String uri) throws IOException, InterruptedException {
         super(uri);
         kvTaskClient = new KVTaskClient(URI.create(uri));
-        this.gson = Managers.getGson();
+        this.gson = new Gson();
       }
 
     public KVTaskClient getKvTaskClient() {
@@ -48,10 +50,10 @@ public class HttpTaskManager extends FileBackedTasksManager {
         }
     }
 
-    public static HttpTaskManager load(String key) {
+    public HttpTaskManager load(String key) {
         HttpTaskManager.key = key; // метод заменяет загрузку данных из файла на загрузку из KVServer
         try {
-            HttpTaskManager httpTaskManager = new HttpTaskManager("http://localhost:8077");
+            HttpTaskManager httpTaskManager = new HttpTaskManager("http://localhost:" + 8000);
             String taskManagerInString = httpTaskManager.getKvTaskClient().load(key); // получаем состояние менеджера с сервера
             if (!taskManagerInString.equals("")) {
                 String[] tasks = taskManagerInString.split("\n");
@@ -100,12 +102,6 @@ public class HttpTaskManager extends FileBackedTasksManager {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         if (jsonObject.toString().contains("epicId")) {
             Subtask subtask = gson.fromJson(jsonObject, Subtask.class);
-/*            Subtask subtask = new Subtask(jsonObject.get("name").getAsString(),
-                    jsonObject.get("description").getAsString(), jsonObject.get("id").getAsInt(),
-                    TaskStatus.valueOf(jsonObject.get("taskStatus").getAsString()),
-                    jsonObject.get("epicId").getAsInt(),
-                    Long.parseLong(jsonObject.get("duration").getAsString()),
-                    Instant.parse(jsonObject.get("startTime").getAsString()));*/
             return subtask;
         } else if (jsonObject.toString().contains("subtasksIds")) {
             Epic epic = gson.fromJson(jsonObject, Epic.class);

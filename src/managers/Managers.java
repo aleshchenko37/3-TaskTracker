@@ -1,8 +1,6 @@
 package managers;
 
 import api.KVServer;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 
@@ -18,12 +16,5 @@ public class Managers {
     }
     public static HttpTaskManager getDefault() throws IOException, InterruptedException {
         return new HttpTaskManager("http://localhost:" + KVServer.PORT);
-    }
-
-    public static Gson getGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.serializeNulls();
-        Gson gson = gsonBuilder.create();
-        return gson;
     }
 }

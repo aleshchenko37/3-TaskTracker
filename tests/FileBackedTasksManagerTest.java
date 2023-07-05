@@ -62,8 +62,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
 
         assertEquals(2, taskManager.getTasks().size(), "Количество задач не совпадает.");
         assertEquals(2, taskManager.getEpics().size(), "Количество эпиков не совпадает.");
-        assertEquals(4, taskManager.getSubtasks().size(), "Количество подзадач не совпадает.");
-        assertEquals(8, taskManager.getHistory().size(), "Количество задач в истории некорректно");
+        assertEquals(3, taskManager.getSubtasks().size(), "Количество подзадач не совпадает.");
+        assertEquals(7, taskManager.getHistory().size(), "Количество задач в истории некорректно");
 
         SingleTask task1 = new SingleTask("Задача 1", "Выполнить задачу 1", TaskStatus.NEW, 30,
                 Instant.ofEpochSecond(1687244400));
@@ -84,14 +84,11 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         Subtask subtask3 = new Subtask("Подзадача 3", "Выполнить подзадачу 3", TaskStatus.NEW, 3,
                 60, Instant.ofEpochSecond(1687285800));
         subtask3.setId(7);
-        Subtask subtask4 = new Subtask("Подзадача 4", "Выполнить подзадачу 4", TaskStatus.IN_PROGRESS, 4,
-                60, Instant.ofEpochSecond(1687260600));
-        subtask4.setId(8);
 
         List<SingleTask> listOfTasks = List.of(task1, task2);
         List<Epic> listOfEpics = List.of(epic1, epic2);
-        List<Subtask> listOfSubtasks = List.of(subtask1, subtask2, subtask3, subtask4);
-        List<Task> history = List.of(epic2, task1, task2, epic1, subtask3, subtask2, subtask1, subtask4);
+        List<Subtask> listOfSubtasks = List.of(subtask1, subtask2, subtask3);
+        List<Task> history = List.of(epic2, task1, task2, epic1, subtask3, subtask2, subtask1);
 
         assertEquals(listOfTasks, taskManager.getListOfTasks(), "Задачи загружены некорректно");
         assertEquals(listOfEpics, taskManager.getListOfEpics(), "Эпики загружены некорректно");

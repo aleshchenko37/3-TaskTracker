@@ -4,12 +4,11 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import managers.*;
+import managers.TaskManager;
 import tasks.Epic;
 import tasks.SingleTask;
 import tasks.Subtask;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -19,18 +18,16 @@ import java.nio.charset.StandardCharsets;
 import static api.Endpoint.POST_ADD_TASK;
 
 public class HttpTaskServer {
-    private static final int PORT = 8080;
+    private static final int PORT = 8888;
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private final HttpServer httpServer;
-    private static final Gson gson = new Gson();
+    public static final Gson gson = new Gson();
     private TaskManager taskManager;
 
     public HttpTaskServer() throws IOException {
+        this.taskManager = taskManager;
         httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks", new TaskHandler());
-        httpServer.start();
-
-        System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
     }
 
     class TaskHandler implements HttpHandler {
@@ -39,7 +36,6 @@ public class HttpTaskServer {
             Endpoint endpoint = getEndpoint(exchange, exchange.getRequestMethod());
 
             String response;
-            //Optional<Integer> taskId = getTaskId(exchange);
 
             int codeStatus = 200;
 
@@ -164,18 +160,6 @@ public class HttpTaskServer {
             }
         }
 
-        /*private Task getTaskFromRequestBody(HttpExchange exchange) {
-            Task task;
-            try {
-                task = gson.fromJson(new String(exchange.getRequestBody()
-                        .readAllBytes(), StandardCharsets.UTF_8), Task.class);
-            } catch (IOException e) {
-                System.out.println("Некорректный формат задачи");
-                task = null;
-            }
-            return task;
-        }*/
-
         private Integer getTaskId(HttpExchange exchange) {
             // метод получает id задачи и возвращает его
             int taskId;
@@ -267,5 +251,13 @@ public class HttpTaskServer {
             }
             return Endpoint.NO_SUCH_ENDPOINT;
         }
+    }
+
+    public void start() {
+        httpServer.start();
+        System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
+    }
+    public void stop() {
+        httpServer.stop(0);
     }
 }
