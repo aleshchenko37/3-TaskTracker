@@ -15,13 +15,12 @@ import java.net.URI;
 import java.util.List;
 
 public class HttpTaskManager extends FileBackedTasksManager {
-    private static Gson gson;
+    private static Gson gson = new Gson();;
     private KVTaskClient kvTaskClient;
     private static String key;
     public HttpTaskManager(String uri) throws IOException, InterruptedException {
         super(uri);
         kvTaskClient = new KVTaskClient(URI.create(uri));
-        this.gson = new Gson();
       }
 
     public KVTaskClient getKvTaskClient() {

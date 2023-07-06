@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import managers.InMemoryTaskManager;
+import managers.TaskManager;
 import tasks.Epic;
 import tasks.SingleTask;
 import tasks.Subtask;
@@ -22,9 +23,9 @@ public class HttpTaskServer {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private final HttpServer httpServer;
     public static final Gson gson = new Gson();
-    private InMemoryTaskManager taskManager;
+    private final TaskManager taskManager;
 
-    public HttpTaskServer(InMemoryTaskManager taskManager) throws IOException {
+    public HttpTaskServer(TaskManager taskManager) throws IOException {
         this.taskManager = taskManager;
         httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks", new TaskHandler());

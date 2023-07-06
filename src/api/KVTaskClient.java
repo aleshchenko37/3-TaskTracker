@@ -1,5 +1,7 @@
 package api;
 
+import exceptions.ManagerSaveException;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -38,6 +40,9 @@ public class KVTaskClient {
                 .version(HttpClient.Version.HTTP_1_1)
                 .build();
         HttpResponse<String> response = client.send(requestSave, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() != 200) {
+            throw new ManagerSaveException("Данные не сохранены, код ошибки: " + response.statusCode());
+        }
     }
 
     public String load(String key) throws IOException, InterruptedException {
@@ -49,6 +54,9 @@ public class KVTaskClient {
                 .uri(URI.create(url + "/load/" + key + "?API_TOKEN=DEBUG"))
                 .build();
         HttpResponse<String> responseLoad = client.send(requestLoad, HttpResponse.BodyHandlers.ofString());
+        if (responseLoad.statusCode() != 200) {
+            throw new ManagerSaveException("Данные не загружены, код ошибки: " + responseLoad.statusCode());
+        }
         return responseLoad.body();
     }
 }
